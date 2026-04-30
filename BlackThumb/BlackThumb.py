@@ -249,30 +249,18 @@ def resultScreen(msg, win, dealer_total, player_total):
     global money, streak, bet, highScore, bestStreak, debt, debtRounds, loanCount, gameOver
 
     if gameOver:
+        shutdownTune()
+    
         while True:
             thumby.display.fill(0)
             thumby.display.drawText("LONESHARK", shake(), 5, 1)
             thumby.display.drawText("GOT YOU!", shake(), 15, 1)
             thumby.display.drawText("A: Quit", 0, 30, 1)
-            shutdownTune()
             thumby.display.update()
     
             if pressA():
-                thumby.display.fill(0)
-                thumby.display.drawText("Exiting...", 5, 15, 1)
-                thumby.display.update()
-                time.sleep(0.5)
                 import sys
                 sys.exit()
-            
-    if pressA():
-        gameOver = False
-        money = 100
-        debt = 0
-        debtRounds = 0
-        loanCount = 0
-        streak = 0
-        return
 
 
     mult = 1 + (streak * 0.5)
@@ -298,9 +286,6 @@ def resultScreen(msg, win, dealer_total, player_total):
                 streak = 0
                 
     if debt > 0 and money > 0:
-        payment = min(money, debt)
-        money -= payment
-        debt -= payment
         debt = max(0, debt)
         debtRounds = max(0, debtRounds)
 
@@ -322,6 +307,7 @@ def resultScreen(msg, win, dealer_total, player_total):
 
     tuneStep = 0
     timer = 0
+    time.sleep(0.15)
 
     while True:
         thumby.display.fill(0)
@@ -438,12 +424,11 @@ def statsScreen():
                 if loanCount < MAX_LOANS:
                     loan = 100
                     money += loan
-                    debt += int(loan * 1.25)
+                    debt += int(loan * 1.5)
                     debtRounds = 0
                     loanCount += 1
                     beep()
                 else:
-                    # optional feedback sound / block
                     thumby.audio.play(200, 100)
         
                 hold = 0
@@ -463,7 +448,7 @@ def betScreen():
     blink = 0
     global bet, money, debt, debtRounds, loanCount
 
-    options = ["NO", 10, 20, 30, 40, 50]
+    options = ["NO", 10, 20, 30, 40, 50, "ALL!"]
     i = 0
 
     while True:
@@ -503,6 +488,9 @@ def betScreen():
         if pressA():
             if options[i] == "NO":
                 bet = 0
+                return
+            elif options[i] == "ALL!":
+                bet = money
                 return
             elif options[i] <= money:
                 bet = options[i]
